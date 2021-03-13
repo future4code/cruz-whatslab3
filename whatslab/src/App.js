@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-const AppSection = styled.section`
+const AppSection = styled.main`
   max-width: 600px;
   min-height: 100vh;
   border: 1px solid black;
@@ -118,19 +118,52 @@ export class App extends React.Component {
     });
   };
 
+  teclaEnter = (event) => {
+    if (event.key == "Enter") {
+      this.enviarMensagem();
+    }
+  };
+
+  duploClique = (event) => {
+    if (window.confirm("Apagar mensagem?") === true) {
+      const excluirMensagem = this.state.mensagens.filter((texto, index) => {
+        if (event !== index) return true;
+        else return false;
+      });
+      this.setState({
+        mensagens: excluirMensagem,
+      });
+    }
+  };
+
   render() {
-    let mensagensEnviadas = this.state.mensagens.map((texto) => {
-      if (texto.usuario !== "" || texto.mensagem !== "")
-        return (
-          <Mensagem>
-            <MensagemUsuario>
-              <div>
-                <strong>{texto.usuario}</strong>
-              </div>
-              <div>{texto.mensagem}</div>
-            </MensagemUsuario>
-          </Mensagem>
-        );
+    let mensagensEnviadas = this.state.mensagens.map((texto, index) => {
+      if (texto.usuario !== "" && texto.mensagem !== "") {
+        if (
+          texto.usuario !== "eu" &&
+          texto.usuario !== "Eu" &&
+          texto.usuario !== "EU" &&
+          texto.usuario !== "eU"
+        )
+          return (
+            <Mensagem>
+              <MensagemUsuario onDoubleClick={() => this.duploClique(index)}>
+                <div>
+                  <strong>{texto.usuario}</strong>
+                </div>
+                <div>{texto.mensagem}</div>
+              </MensagemUsuario>
+            </Mensagem>
+          );
+        else
+          return (
+            <Mensagem>
+              <MensagemEu onDoubleClick={() => this.duploClique(index)}>
+                <div>{texto.mensagem}</div>
+              </MensagemEu>
+            </Mensagem>
+          );
+      }
     });
     return (
       <AppSection>
@@ -145,6 +178,7 @@ export class App extends React.Component {
             onChange={this.novaMensagem}
             value={this.state.entradaMensagem}
             placeholder={"Mensagem"}
+            onKeyDown={this.teclaEnter}
           />
           <ButtonEnviar onClick={this.enviarMensagem}>Enviar</ButtonEnviar>
         </Formulario>
